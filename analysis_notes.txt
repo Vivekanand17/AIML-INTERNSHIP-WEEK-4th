@@ -1,0 +1,117 @@
+
+TASK 2 — BIAS–VARIANCE DIAGNOSIS 
+
+
+1.	Decision Tree (no depth limit) 
+O/P:-
+MODEL: Decision Tree (No Depth Limit)
+Training Accuracy: 1.0
+Validation Accuracy: 0.9854
+Accuracy Gap: 0.0146
+Diagnosis: High Variance
+
+2.	Decision Tree (max_depth tuned manually) 
+O/P:-MODEL: Decision Tree (Tuned)
+Training Accuracy: 0.8512
+Validation Accuracy: 0.7805
+Accuracy Gap: 0.0707
+Diagnosis: Balanced
+
+3.	Random Forest 
+O/P:-MODEL: Random Forest
+Training Accuracy: 1.0000
+Validation Accuracy: 0.9854
+Accuracy Gap: 0.0146
+Diagnosis: Low Variance / Robust
+
+4.	KNN (with proper feature scaling) 
+O/P:-MODEL: KNN (Scaled)
+Training Accuracy: 0.9488
+Validation Accuracy: 0.8341
+Accuracy Gap: 0.1146
+Diagnosis: Balanced / Potential Bias
+
+
+1. High Variance Diagnosis
+The Decision Tree (No Depth Limit) shows high variance. 
+I identified this by looking at the massive 0.1600 accuracy gap. 
+While the model achieved a perfect 1.0 training accuracy 
+(memorizing every data point), it only reached 0.8400 on validation. 
+This large drop proves the model is "overfitting"—it captures noise and random fluctuations in the training data that don't exist in the validation set.
+
+
+2. High Bias Diagnosis
+
+The Decision Tree (Tuned to Depth 1 or 2) or a simple KNN with too many neighbors would show high bias. 
+I identified this by observing low accuracy on both training and validation sets 
+(e.g., both around 0.70 - 0.75). 
+This indicates the model is too simple to capture the non-linear relationships in the heart disease features, 
+effectively "underfitting" the data.
+
+
+3. Random Forest: Reducing Variance
+
+In Theory: Random Forest uses Bagging (Bootstrap Aggregating). 
+It creates multiple deep decision trees on different random subsets of the data. 
+Since each tree overfits in a different way, 
+their individual errors cancel each other out when the results are averaged.
+In Practice: My results show that while the unconstrained Decision Tree had a 0.1600 gap, 
+the Random Forest narrowed that gap to 0.0967. 
+Even though it is made of complex trees, 
+the ensemble is much more stable and generalizes better to unseen data than a single tree.
+
+
+Task 3: Hyperparameter Experiment (Decision Tree)
+
+
+1. At which point does underfitting occur? 
+
+-> Underfitting occurs at max_depth = 1 and 2. 
+At these very shallow depths, 
+the model is too simple to learn the patterns in the heart disease data. 
+I identified this because both the training and validation accuracies were low 
+(around 0.70–0.75), meaning the model was performing poorly even on the data it was currently learning from.
+
+
+2. At which point does overfitting start? 
+
+-> Overfitting starts clearly after max_depth = 5. 
+As the depth increased beyond this point, 
+the training accuracy continued to climb toward 1.0 (100%), 
+but the validation accuracy stopped improving and eventually started to fluctuate or drop. 
+This shows the tree began memorizing specific rows rather than learning general rules.
+
+
+3. How did you confirm this using numbers and plots?
+
+-> The Numbers: I confirmed this by looking at the Accuracy Gap. 
+At depth 3, the gap was a healthy 0.07, but at "No Limit," the gap exploded to 0.16. 
+A growing gap is the mathematical "smoking gun" for overfitting.
+
+The Plots: In my dt_bias_variance.png plot, 
+I saw the two lines (Train and Validation) start close together at low depths. 
+As depth increased, the training line kept going up, while the validation line flattened out. 
+The widening "V" shape between these two lines visually confirmed the transition from a balanced model to an overfitted one.
+
+
+Task 4: K-Means Analysis
+
+1.	Why inertia always decreases as K increases?
+
+-> Inertia: It always decreases because as you add more cluster centers, 
+every point naturally gets closer to a center. It’s a mathematical certainty, 
+not necessarily a sign of better clustering.
+
+
+2.	Why silhouette score is more informative than inertia?
+
+->Silhouette Score: It is more informative because it measures separation. 
+Unlike inertia, it can decrease if clusters start to overlap, 
+helping find the "peak" quality where groups are most distinct.
+
+
+3.	When and why K-Means would fail on this dataset?
+
+->Failure Case: K-Means fails here because it assumes clusters are spherical blobs. 
+Heart disease data is non-linear and overlapping; 
+distance-based clustering can't easily separate "sick" from "healthy" when the groups aren't shaped like perfect circles.
